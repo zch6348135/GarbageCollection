@@ -65,13 +65,13 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            toolbar.setTitle("设置");
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.replace(R.id.container, new SettingsFragment()).commitAllowingStateLoss();
-            return true;
-        }
+//        if (id == R.id.action_settings) {
+//            toolbar.setTitle("设置");
+//            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+//            fragmentTransaction.addToBackStack(null);
+//            fragmentTransaction.replace(R.id.container, new SettingsFragment()).commitAllowingStateLoss();
+//            return true;
+//        }
         return super.onOptionsItemSelected(item);
     }
 
