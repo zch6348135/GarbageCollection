@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -156,12 +157,18 @@ public class AppointmentFragment extends Fragment implements View.OnClickListene
                     showTip("请选择预约时间");
                 }else {
                     showTip("请求提交中...");
-                    mTvType.setText("");
-                    mTvTime.setText("");
-                    mTvWeight.setText("");
-                    showTip("提交成功,稍后会有工作人员联系您");
+                    showTip("提交成功,请保留下方二维码，稍后会有工作人员联系您");
+                    FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+                        fragmentTransaction.addToBackStack(null);
+                    Fragment currentFragment = new QRCode();
+                    fragmentTransaction.replace(R.id.frame_qrcode, currentFragment).commitAllowingStateLoss();
                 }
 
+                break;
+            case R.id.btn_clear:
+                mTvType.setText("");
+                mTvTime.setText("");
+                mTvWeight.setText("");
                 break;
         }
     }
