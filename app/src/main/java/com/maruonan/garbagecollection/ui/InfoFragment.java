@@ -7,8 +7,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.maruonan.garbagecollection.R;
+import com.maruonan.garbagecollection.bean.UserBean;
+
+import org.litepal.crud.DataSupport;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -18,7 +24,7 @@ import com.maruonan.garbagecollection.R;
  * Use the {@link InfoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class InfoFragment extends Fragment {
+public class InfoFragment extends Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -27,6 +33,10 @@ public class InfoFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private EditText etName;
+    private EditText etTel;
+    private EditText etAddr;
+    private UserBean DBUser;
 
     private OnFragmentInteractionListener mListener;
 
@@ -59,13 +69,24 @@ public class InfoFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_info, container, false);
+        View view = inflater.inflate(R.layout.fragment_info, container, false);
+        etName = view.findViewById(R.id.et_info_name);
+        etTel = view.findViewById(R.id.et_info_tel);
+        etAddr = view.findViewById(R.id.et_info_addr);
+        Button mBtnSubmit = view.findViewById(R.id.btn_info_submit);
+        mBtnSubmit.setOnClickListener(this);
+        DBUser = DataSupport.find(UserBean.class, 1);
+        etName.setText(DBUser.getUsername());
+        etTel.setText(DBUser.getTelNum());
+        etAddr.setText(DBUser.getAddress());
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -81,6 +102,7 @@ public class InfoFragment extends Fragment {
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
+
 //            throw new RuntimeException(context.toString()
 //                    + " must implement OnFragmentInteractionListener");
         }
@@ -90,6 +112,27 @@ public class InfoFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.btn_info_submit:
+                String name = etName.getText().toString();
+                String tel = etTel.getText().toString();
+                String addr = etAddr.getText().toString();
+                if (!name.equals("") && !tel.equals("") && !addr.equals("")){
+                    DBUser.setUsername(name);
+                    DBUser.setTelNum(tel);
+                    DBUser.setAddress(addr);
+                    if (DBUser.save()){
+                        showTip("保存成功");
+                    }else {
+                        showTip("保存失败");
+                    }
+                }
+                break;
+        }
     }
 
     /**
@@ -105,5 +148,8 @@ public class InfoFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+    public void showTip(final String str) {
+        Toast.makeText(this.getContext(), str, Toast.LENGTH_SHORT).show();
     }
 }

@@ -13,11 +13,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
+import com.maruonan.garbagecollection.bean.UserBean;
 import com.maruonan.garbagecollection.ui.AppointmentFragment;
 import com.maruonan.garbagecollection.ui.InfoFragment;
 import com.maruonan.garbagecollection.ui.PointFragment;
 import com.maruonan.garbagecollection.ui.SettingsFragment;
+
+import org.litepal.LitePal;
+import org.litepal.crud.DataSupport;
+import org.litepal.tablemanager.Connector;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -28,20 +35,48 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LitePal.getDatabase();
+        UserBean user = DataSupport.find(UserBean.class, 1);
+        if (user == null){
+            user = new UserBean();
+            user.setId(1);
+            user.setUsername("马若男");
+            user.setTelNum("1335412375");
+            user.setAddress("阳光小区5栋4单元33号");
+            user.save();
+        }
+
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
 
         mDrawer = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        mDrawer.addDrawerListener(toggle);
-        toggle.syncState();
+
+
+
 
         NavigationView navigationView = findViewById(R.id.nav_view);
+        View headerView=navigationView.getHeaderView(0);
+        final TextView tvHeaderName = headerView.findViewById(R.id.tv_header_name);
+        final TextView tvHeaderAddr = headerView.findViewById(R.id.tv_header_addr);
+        tvHeaderName.setText(user.getUsername());
+        tvHeaderAddr.setText(user.getAddress());
         navigationView.setNavigationItemSelectedListener(this);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                UserBean DBUser = DataSupport.find(UserBean.class, 1);
+                tvHeaderName.setText(DBUser.getUsername());
+                tvHeaderAddr.setText(DBUser.getAddress());
+            }
+        };
+        toggle.syncState();
+        mDrawer.addDrawerListener(toggle);
         initFragment(savedInstanceState);
+
     }
 
     @Override

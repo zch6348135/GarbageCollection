@@ -5,7 +5,6 @@ import android.content.res.AssetManager;
 
 import com.google.gson.Gson;
 import com.maruonan.garbagecollection.bean.TextBean;
-import com.maruonan.garbagecollection.bean.TypeBean;
 
 import org.json.JSONArray;
 

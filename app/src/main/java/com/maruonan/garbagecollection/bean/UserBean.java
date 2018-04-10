@@ -1,9 +1,25 @@
 package com.maruonan.garbagecollection.bean;
 
-public class UserBean {
-    private  String username;
+import org.litepal.annotation.Column;
+import org.litepal.crud.DataSupport;
+
+public class UserBean extends DataSupport {
+
+    private  int id;
+    @Column(unique = true, defaultValue = "unkown")
+    private String username;
+
     private String telNum;
+
     private String address;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getUsername() {
         return username;
