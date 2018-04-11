@@ -11,6 +11,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.maruonan.garbagecollection.bean.UserBean;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -64,27 +66,34 @@ public class SignupActivity extends AppCompatActivity {
         final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this,
                 R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Creating Account...");
+        progressDialog.setMessage("注册中...");
         progressDialog.show();
 
         String name = _nameText.getText().toString();
         String address = _addressText.getText().toString();
         String mobile = _mobileText.getText().toString();
         String password = _passwordText.getText().toString();
-        String reEnterPassword = _reEnterPasswordText.getText().toString();
 
-        // TODO: Implement your own signup logic here.
+       UserBean user = new UserBean();
+       user.setId(1);
+       user.setUsername(name);
+       user.setTelNum(mobile);
+       user.setAddress(address);
+       user.setPassword(password);
+       final boolean b = user.save();
+
 
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
-                        // On complete call either onSignupSuccess or onSignupFailed
-                        // depending on success
-                        onSignupSuccess();
-                        // onSignupFailed();
+                        if (b){
+                            onSignupSuccess();
+                        }else {
+                            onSignupFailed();
+                        }
                         progressDialog.dismiss();
                     }
-                }, 3000);
+                }, 2000);
     }
 
 
@@ -95,7 +104,7 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public void onSignupFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "注册失败", Toast.LENGTH_LONG).show();
 
         _signupButton.setEnabled(true);
     }
@@ -109,41 +118,40 @@ public class SignupActivity extends AppCompatActivity {
         String password = _passwordText.getText().toString();
         String reEnterPassword = _reEnterPasswordText.getText().toString();
 
-        if (name.isEmpty() || name.length() < 3) {
-            _nameText.setError("at least 3 characters");
+        if (name.isEmpty() || name.length() < 2) {
+            _nameText.setError("至少两个字符");
             valid = false;
         } else {
             _nameText.setError(null);
         }
 
         if (address.isEmpty()) {
-            _addressText.setError("Enter Valid Address");
+            _addressText.setError("住址不合法");
             valid = false;
         } else {
             _addressText.setError(null);
         }
 
         if (mobile.isEmpty() || mobile.length()!=11) {
-            _mobileText.setError("Enter Valid Mobile Number");
+            _mobileText.setError("手机号不合法");
             valid = false;
         } else {
             _mobileText.setError(null);
         }
 
         if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
-            _passwordText.setError("between 4 and 10 alphanumeric characters");
+            _passwordText.setError("密码长度在4~10之间");
             valid = false;
         } else {
             _passwordText.setError(null);
         }
 
         if (reEnterPassword.isEmpty() || reEnterPassword.length() < 4 || reEnterPassword.length() > 10 || !(reEnterPassword.equals(password))) {
-            _reEnterPasswordText.setError("Password Do not match");
+            _reEnterPasswordText.setError("与密码不符");
             valid = false;
         } else {
             _reEnterPasswordText.setError(null);
         }
-
         return valid;
     }
 }

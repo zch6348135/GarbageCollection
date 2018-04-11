@@ -41,6 +41,9 @@ public class LoginActivity extends AppCompatActivity {
         LitePal.getDatabase();
 
         mUser = DataSupport.find(UserBean.class, 1);
+        if (mUser != null){
+            _signupLink.setEnabled(false);
+        }
 
         _loginButton.setOnClickListener(new View.OnClickListener() {
 
@@ -57,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                 // Start the Signup activity
                 Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
                 startActivityForResult(intent, REQUEST_SIGNUP);
-                finish();
+                //finish();
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
             }
         });
@@ -86,8 +89,6 @@ public class LoginActivity extends AppCompatActivity {
         final String mobile = _mobileText.getText().toString();
         final String password = _passwordText.getText().toString();
 
-        // TODO: Implement your own authentication logic here.
-
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
@@ -110,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 // TODO: Implement successful signup logic here
                 // By default we just finish the Activity and log them in automatically
-                this.finish();
+                //this.finish();
             }
         }
     }
@@ -154,5 +155,13 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         return valid;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mUser != null){
+            _signupLink.setEnabled(false);
+        }
     }
 }
