@@ -5,13 +5,23 @@ import org.litepal.crud.DataSupport;
 
 public class UserBean extends DataSupport {
 
-    private  int id;
+    private int id;
     @Column(unique = true, defaultValue = "unkown")
     private String username;
 
     private String telNum;
 
     private String address;
+
+    private String password;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public int getId() {
         return id;

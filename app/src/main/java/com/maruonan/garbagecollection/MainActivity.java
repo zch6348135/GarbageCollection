@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -21,11 +20,8 @@ import com.maruonan.garbagecollection.ui.AppointmentFragment;
 import com.maruonan.garbagecollection.ui.HistoryFragment;
 import com.maruonan.garbagecollection.ui.InfoFragment;
 import com.maruonan.garbagecollection.ui.PointFragment;
-import com.maruonan.garbagecollection.ui.SettingsFragment;
 
-import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
-import org.litepal.tablemanager.Connector;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -36,7 +32,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LitePal.getDatabase();
+
         UserBean user = DataSupport.find(UserBean.class, 1);
         if (user == null){
             user = new UserBean();
