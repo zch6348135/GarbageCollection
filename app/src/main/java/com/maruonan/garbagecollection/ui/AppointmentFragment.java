@@ -22,6 +22,7 @@ import com.bigkoo.pickerview.listener.OnTimeSelectListener;
 import com.bigkoo.pickerview.view.OptionsPickerView;
 import com.bigkoo.pickerview.view.TimePickerView;
 import com.maruonan.garbagecollection.R;
+import com.maruonan.garbagecollection.bean.ApptBean;
 import com.maruonan.garbagecollection.bean.TextBean;
 import com.maruonan.garbagecollection.util.Utils;
 
@@ -54,7 +55,7 @@ public class AppointmentFragment extends Fragment implements View.OnClickListene
     private TextView mTvType;
     private TextView mTvTime;
     private TextView mTvWeight;
-
+    private Fragment currentFragment;
     private OnFragmentInteractionListener mListener;
 
     public AppointmentFragment() {
@@ -105,6 +106,8 @@ public class AppointmentFragment extends Fragment implements View.OnClickListene
         mTvWeight = view.findViewById(R.id.tv_weight);
         Button mBtnSubmit = view.findViewById(R.id.btn_submit);
         mBtnSubmit.setOnClickListener(this);
+        Button mBtnClear = view.findViewById(R.id.btn_clear);
+        mBtnClear.setOnClickListener(this);
         return view;
     }
 
@@ -149,19 +152,31 @@ public class AppointmentFragment extends Fragment implements View.OnClickListene
                 showPickerView(mTvWeight, weightList, "重量选择");
                 break;
             case R.id.btn_submit:
-                if (mTvType.getText().equals("")){
+                String type = mTvType.getText().toString();
+                String weight = mTvWeight.getText().toString();
+                String time = mTvTime.getText().toString();
+                if (type.equals("")){
                     showTip("请选择垃圾类型");
-                }else if (mTvWeight.getText().equals("")){
+                }else if (weight.equals("")){
                     showTip("请选择垃圾重量");
-                }else if (mTvTime.getText().equals("")){
+                }else if (time.equals("")){
                     showTip("请选择预约时间");
                 }else {
                     showTip("请求提交中...");
-                    showTip("提交成功,请保留下方二维码，稍后会有工作人员联系您");
-                    FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+                    ApptBean apptBean = new ApptBean();
+                    apptBean.setType(type);
+                    apptBean.setWeight(weight);
+                    apptBean.setTime(time);
+                    if (apptBean.save()){
+                        showTip("提交成功,请保留下方二维码，稍后会有工作人员联系您");
+                        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
                         fragmentTransaction.addToBackStack(null);
-                    Fragment currentFragment = new QRCode();
-                    fragmentTransaction.replace(R.id.frame_qrcode, currentFragment).commitAllowingStateLoss();
+                        currentFragment = new QRCode();
+                        fragmentTransaction.replace(R.id.frame_qrcode, currentFragment).commitAllowingStateLoss();
+                    }else {
+                        showTip("提交失败，请重试");
+                    }
+
                 }
 
                 break;
@@ -169,6 +184,12 @@ public class AppointmentFragment extends Fragment implements View.OnClickListene
                 mTvType.setText("");
                 mTvTime.setText("");
                 mTvWeight.setText("");
+                if (currentFragment != null){
+                    FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.detach(currentFragment);
+                    fragmentTransaction.commit();
+                }
                 break;
         }
     }

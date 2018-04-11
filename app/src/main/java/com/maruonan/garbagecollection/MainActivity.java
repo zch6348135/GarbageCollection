@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.maruonan.garbagecollection.bean.UserBean;
 import com.maruonan.garbagecollection.ui.AppointmentFragment;
+import com.maruonan.garbagecollection.ui.HistoryFragment;
 import com.maruonan.garbagecollection.ui.InfoFragment;
 import com.maruonan.garbagecollection.ui.PointFragment;
 import com.maruonan.garbagecollection.ui.SettingsFragment;
@@ -120,6 +121,10 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_appointment:
                 toolbar.setTitle("我的预约");
                 currentFragment = new AppointmentFragment();
+                break;
+            case R.id.nav_history:
+                toolbar.setTitle("历史预约");
+                currentFragment = new HistoryFragment();
                 break;
             case R.id.nav_point:
                 toolbar.setTitle("我的积分");

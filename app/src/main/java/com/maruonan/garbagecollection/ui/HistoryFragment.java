@@ -4,12 +4,15 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.maruonan.garbagecollection.R;
+import com.maruonan.garbagecollection.adapter.ApptAdapter;
 import com.maruonan.garbagecollection.bean.ApptBean;
 
 import org.litepal.crud.DataSupport;
@@ -19,12 +22,12 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link PointFragment.OnFragmentInteractionListener} interface
+ * {@link HistoryFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link PointFragment#newInstance} factory method to
+ * Use the {@link HistoryFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PointFragment extends Fragment {
+public class HistoryFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -36,7 +39,7 @@ public class PointFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public PointFragment() {
+    public HistoryFragment() {
         // Required empty public constructor
     }
 
@@ -46,11 +49,11 @@ public class PointFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment PointFragment.
+     * @return A new instance of fragment HistoryFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static PointFragment newInstance(String param1, String param2) {
-        PointFragment fragment = new PointFragment();
+    public static HistoryFragment newInstance(String param1, String param2) {
+        HistoryFragment fragment = new HistoryFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -71,13 +74,13 @@ public class PointFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_point, container, false);
-        TextView tvPoint = view.findViewById(R.id.tv_point);
-        TextView tvTimes = view.findViewById(R.id.tv_times);
-        List<ApptBean> apptList =  DataSupport.findAll(ApptBean.class);
-        int times = apptList.size();
-        tvPoint.setText(String.valueOf(times * 10));
-        tvTimes.setText(String.valueOf(times));
+        View view = inflater.inflate(R.layout.fragment_history, container, false);
+        RecyclerView recyclerView = view.findViewById(R.id.history_recycler_view);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext());
+        recyclerView.setLayoutManager(layoutManager);
+        ApptAdapter adapter = new ApptAdapter(DataSupport.findAll(ApptBean.class));
+        recyclerView.setAdapter(adapter);
+        recyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(),DividerItemDecoration.VERTICAL));
         return view;
     }
 
