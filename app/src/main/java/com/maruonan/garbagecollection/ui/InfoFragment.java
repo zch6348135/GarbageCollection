@@ -1,6 +1,7 @@
 package com.maruonan.garbagecollection.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.maruonan.garbagecollection.LoginActivity;
 import com.maruonan.garbagecollection.R;
 import com.maruonan.garbagecollection.bean.UserBean;
 
@@ -82,6 +84,8 @@ public class InfoFragment extends Fragment implements View.OnClickListener {
         etAddr = view.findViewById(R.id.et_info_addr);
         Button mBtnSubmit = view.findViewById(R.id.btn_info_submit);
         mBtnSubmit.setOnClickListener(this);
+        Button btnLogoff = view.findViewById(R.id.btn_logout);
+        btnLogoff.setOnClickListener(this);
         DBUser = DataSupport.find(UserBean.class, 1);
         etName.setText(DBUser.getUsername());
         etTel.setText(DBUser.getTelNum());
@@ -131,6 +135,11 @@ public class InfoFragment extends Fragment implements View.OnClickListener {
                         showTip("保存失败");
                     }
                 }
+                break;
+            case R.id.btn_logout:
+                Intent intent = new Intent(this.getContext(), LoginActivity.class);
+                startActivity(intent);
+                getActivity().finish();
                 break;
         }
     }

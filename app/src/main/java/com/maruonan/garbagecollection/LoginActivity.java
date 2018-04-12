@@ -1,6 +1,8 @@
 package com.maruonan.garbagecollection;
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -8,7 +10,9 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,18 +24,27 @@ import org.litepal.crud.DataSupport;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity{
 
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
     private UserBean mUser;
 
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+    private Boolean isChecked;
+    private String mobile;
+    private String password;
+
     @BindView(R.id.input_mobile) EditText _mobileText;
     @BindView(R.id.input_password) EditText _passwordText;
     @BindView(R.id.btn_login) Button _loginButton;
     @BindView(R.id.link_signup) TextView _signupLink;
+    @BindView(R.id.cb_remember) CheckBox _remberCheck;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,33 +52,30 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
         LitePal.getDatabase();
-
         mUser = DataSupport.find(UserBean.class, 1);
         if (mUser != null){
             _signupLink.setEnabled(false);
         }
-
-        _loginButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                login();
-            }
-        });
-
-        _signupLink.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // Start the Signup activity
-                Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
-                startActivityForResult(intent, REQUEST_SIGNUP);
-                //finish();
-                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-            }
-        });
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+        isChecked = pref.getBoolean(CommonValues.ISREMEMBER, false);
+        _remberCheck.setChecked(isChecked);
+        if (isChecked){
+            mobile = pref.getString(CommonValues.MOBILE, "");
+            password = pref.getString(CommonValues.PASSWORD, "");
+            _mobileText.setText(mobile);
+            _passwordText.setText(password);
+        }
+        getWindow().setSoftInputMode( WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+    }
+    @OnClick(R.id.cb_remember)
+    public void remember() {
+        isChecked = _remberCheck.isChecked();
+        editor = pref.edit();
+        editor.putBoolean(CommonValues.ISREMEMBER, isChecked);
+        editor.apply();
     }
 
+    @OnClick(R.id.btn_login)
     public void login() {
         Log.d(TAG, "Login");
 
@@ -86,8 +96,8 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog.setMessage("登录中...");
         progressDialog.show();
 
-        final String mobile = _mobileText.getText().toString();
-        final String password = _passwordText.getText().toString();
+        mobile = _mobileText.getText().toString();
+        password = _passwordText.getText().toString();
 
         new android.os.Handler().postDelayed(
                 new Runnable() {
@@ -103,15 +113,22 @@ public class LoginActivity extends AppCompatActivity {
                 }, 2000);
     }
 
+    @OnClick(R.id.link_signup)
+    public void signup(){
+        Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
+        startActivityForResult(intent, REQUEST_SIGNUP);
+        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SIGNUP) {
             if (resultCode == RESULT_OK) {
-
-                // TODO: Implement successful signup logic here
-                // By default we just finish the Activity and log them in automatically
-                //this.finish();
+                mUser = DataSupport.find(UserBean.class, 1);
+                _signupLink.setEnabled(false);
+                _mobileText.setText(mUser.getTelNum());
+                _passwordText.setText(mUser.getPassword());
             }
         }
     }
@@ -124,6 +141,12 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onLoginSuccess() {
         _loginButton.setEnabled(true);
+        if (isChecked){
+            editor = pref.edit();
+            editor.putString(CommonValues.MOBILE, mobile);
+            editor.putString(CommonValues.PASSWORD, password);
+            editor.apply();
+        }
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
         finish();
@@ -157,11 +180,5 @@ public class LoginActivity extends AppCompatActivity {
         return valid;
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (mUser != null){
-            _signupLink.setEnabled(false);
-        }
-    }
+
 }

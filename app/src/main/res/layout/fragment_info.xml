@@ -75,6 +75,7 @@
                 android:layout_marginEnd="10dp"
                 android:layout_marginRight="0dp"
                 android:singleLine="true"
+                tools:text="赵崇翰"
                 android:textSize="@dimen/text_size" />
         </LinearLayout>
     </LinearLayout>
@@ -118,7 +119,7 @@
                 android:layout_marginEnd="10dp"
                 android:layout_marginRight="0dp"
                 android:singleLine="true"
-                android:text="13390098798"
+                tools:text="13390098798"
                 android:textSize="@dimen/text_size" />
         </LinearLayout>
     </LinearLayout>
@@ -162,7 +163,7 @@
                 android:layout_marginEnd="10dp"
                 android:layout_marginRight="0dp"
                 android:singleLine="true"
-                android:text="阳光小区5栋4单元33号"
+                tools:text="阳光小区5栋4单元33号"
                 android:textSize="@dimen/text_size" />
         </LinearLayout>
 
@@ -185,11 +186,25 @@
         android:layout_marginTop="8dp"
         android:gravity="center">
 
-        <Button
+        <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_info_submit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="修改" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/btn_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:text="注销" />
     </LinearLayout>
 
 
