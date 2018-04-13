@@ -24,6 +24,7 @@ public class SignupActivity extends AppCompatActivity {
     @BindView(R.id.input_address) EditText _addressText;
     @BindView(R.id.input_mobile) EditText _mobileText;
     @BindView(R.id.input_password) EditText _passwordText;
+    @BindView(R.id.input_card) EditText _cardText;
     @BindView(R.id.input_reEnterPassword) EditText _reEnterPasswordText;
     @BindView(R.id.btn_signup) Button _signupButton;
     @BindView(R.id.link_login) TextView _loginLink;
@@ -73,6 +74,7 @@ public class SignupActivity extends AppCompatActivity {
         String address = _addressText.getText().toString();
         String mobile = _mobileText.getText().toString();
         String password = _passwordText.getText().toString();
+        String cardNumber = _cardText.getText().toString();
 
        UserBean user = new UserBean();
        user.setId(1);
@@ -80,6 +82,7 @@ public class SignupActivity extends AppCompatActivity {
        user.setTelNum(mobile);
        user.setAddress(address);
        user.setPassword(password);
+       user.setCardNumber(cardNumber);
        final boolean b = user.save();
 
 
@@ -93,7 +96,7 @@ public class SignupActivity extends AppCompatActivity {
                         }
                         progressDialog.dismiss();
                     }
-                }, 2000);
+                }, CommonValues.DELAYMILLIS);
     }
 
 
@@ -117,6 +120,7 @@ public class SignupActivity extends AppCompatActivity {
         String mobile = _mobileText.getText().toString();
         String password = _passwordText.getText().toString();
         String reEnterPassword = _reEnterPasswordText.getText().toString();
+        String cardNumber = _cardText.getText().toString();
 
         if (name.isEmpty() || name.length() < 2) {
             _nameText.setError("至少两个字符");
@@ -151,6 +155,12 @@ public class SignupActivity extends AppCompatActivity {
             valid = false;
         } else {
             _reEnterPasswordText.setError(null);
+        }
+        if (cardNumber.isEmpty() || cardNumber.length()!=19) {
+            _cardText.setError("银行卡长度必须为19位");
+            valid = false;
+        } else {
+            _cardText.setError(null);
         }
         return valid;
     }

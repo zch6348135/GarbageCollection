@@ -1,5 +1,6 @@
 package com.maruonan.garbagecollection.ui;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.maruonan.garbagecollection.CommonValues;
 import com.maruonan.garbagecollection.LoginActivity;
 import com.maruonan.garbagecollection.R;
 import com.maruonan.garbagecollection.bean.UserBean;
@@ -38,8 +40,11 @@ public class InfoFragment extends Fragment implements View.OnClickListener {
     private EditText etName;
     private EditText etTel;
     private EditText etAddr;
+    private EditText etCard;
     private UserBean DBUser;
 
+    private Button mBtnSubmit;
+    private Button mBtnLogoff;
     private OnFragmentInteractionListener mListener;
 
     public InfoFragment() {
@@ -82,14 +87,16 @@ public class InfoFragment extends Fragment implements View.OnClickListener {
         etName = view.findViewById(R.id.et_info_name);
         etTel = view.findViewById(R.id.et_info_tel);
         etAddr = view.findViewById(R.id.et_info_addr);
-        Button mBtnSubmit = view.findViewById(R.id.btn_info_submit);
+        etCard = view.findViewById(R.id.et_info_card);
+        mBtnSubmit = view.findViewById(R.id.btn_info_submit);
         mBtnSubmit.setOnClickListener(this);
-        Button btnLogoff = view.findViewById(R.id.btn_logout);
-        btnLogoff.setOnClickListener(this);
+        mBtnLogoff = view.findViewById(R.id.btn_logout);
+        mBtnLogoff.setOnClickListener(this);
         DBUser = DataSupport.find(UserBean.class, 1);
         etName.setText(DBUser.getUsername());
         etTel.setText(DBUser.getTelNum());
         etAddr.setText(DBUser.getAddress());
+        etCard.setText(DBUser.getCardNumber());
         return view;
     }
 
@@ -119,27 +126,59 @@ public class InfoFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void onClick(View view) {
+    public void onClick(final View view) {
         switch (view.getId()){
             case R.id.btn_info_submit:
-                String name = etName.getText().toString();
-                String tel = etTel.getText().toString();
-                String addr = etAddr.getText().toString();
-                if (!name.equals("") && !tel.equals("") && !addr.equals("")){
-                    DBUser.setUsername(name);
-                    DBUser.setTelNum(tel);
-                    DBUser.setAddress(addr);
-                    if (DBUser.save()){
-                        showTip("保存成功");
-                    }else {
-                        showTip("保存失败");
-                    }
+                final String name = etName.getText().toString();
+                final String tel = etTel.getText().toString();
+                final String addr = etAddr.getText().toString();
+                if (validate()){
+                    mBtnSubmit.setEnabled(false);
+                    final ProgressDialog progressDialog = new ProgressDialog(view.getContext(),
+                            R.style.AppTheme_Dark_Dialog);
+                    progressDialog.setIndeterminate(true);
+                    progressDialog.setMessage("提交中...");
+                    progressDialog.show();
+
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+                                    // On complete call either onLoginSuccess or onLoginFailed
+                                    DBUser.setUsername(name);
+                                    DBUser.setTelNum(tel);
+                                    DBUser.setAddress(addr);
+                                    if (DBUser.save()){
+                                        showTip("保存成功");
+                                    }else {
+                                        showTip("保存失败");
+                                    }
+                                    mBtnSubmit.setEnabled(true);
+                                    progressDialog.dismiss();
+                                }
+                            }, CommonValues.DELAYMILLIS);
+
+
                 }
                 break;
             case R.id.btn_logout:
-                Intent intent = new Intent(this.getContext(), LoginActivity.class);
-                startActivity(intent);
-                getActivity().finish();
+                mBtnLogoff.setEnabled(false);
+                final ProgressDialog progressDialog = new ProgressDialog(view.getContext(),
+                        R.style.AppTheme_Dark_Dialog);
+                progressDialog.setIndeterminate(true);
+                progressDialog.setMessage("注销中...");
+                progressDialog.show();
+                new android.os.Handler().postDelayed(
+                        new Runnable() {
+                            public void run() {
+                                Intent intent = new Intent(view.getContext(), LoginActivity.class);
+                                startActivity(intent);
+                                getActivity().finish();
+                                mBtnLogoff.setEnabled(true);
+                                progressDialog.dismiss();
+                            }
+                        }, CommonValues.DELAYMILLIS);
+
+
                 break;
         }
     }
@@ -160,5 +199,42 @@ public class InfoFragment extends Fragment implements View.OnClickListener {
     }
     public void showTip(final String str) {
         Toast.makeText(this.getContext(), str, Toast.LENGTH_SHORT).show();
+    }
+    public boolean validate() {
+        boolean valid = true;
+
+        String name = etName.getText().toString();
+        String address = etAddr.getText().toString();
+        String mobile = etTel.getText().toString();
+        String cardNumber = etCard.getText().toString();
+
+        if (name.isEmpty() || name.length() < 2) {
+            etName.setError("至少两个字符");
+            valid = false;
+        } else {
+            etName.setError(null);
+        }
+
+        if (address.isEmpty()) {
+            etAddr.setError("住址不合法");
+            valid = false;
+        } else {
+            etAddr.setError(null);
+        }
+
+        if (mobile.isEmpty() || mobile.length()!=11) {
+            etTel.setError("手机号不合法");
+            valid = false;
+        } else {
+            etTel.setError(null);
+        }
+
+        if (cardNumber.isEmpty() || cardNumber.length()!=19) {
+            etCard.setError("银行卡长度必须为19位");
+            valid = false;
+        } else {
+            etCard.setError(null);
+        }
+        return valid;
     }
 }

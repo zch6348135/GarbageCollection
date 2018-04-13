@@ -8,4 +8,5 @@ public class CommonValues {
     public static String ISREMEMBER = "is_remember";
     public static String MOBILE = "mobile";
     public static String PASSWORD = "password";
+    public static int DELAYMILLIS = 1500;
 }

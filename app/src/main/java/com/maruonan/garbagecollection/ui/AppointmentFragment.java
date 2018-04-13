@@ -1,5 +1,6 @@
 package com.maruonan.garbagecollection.ui;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
@@ -21,6 +22,7 @@ import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
 import com.bigkoo.pickerview.listener.OnTimeSelectListener;
 import com.bigkoo.pickerview.view.OptionsPickerView;
 import com.bigkoo.pickerview.view.TimePickerView;
+import com.maruonan.garbagecollection.CommonValues;
 import com.maruonan.garbagecollection.R;
 import com.maruonan.garbagecollection.bean.ApptBean;
 import com.maruonan.garbagecollection.bean.TextBean;
@@ -56,6 +58,7 @@ public class AppointmentFragment extends Fragment implements View.OnClickListene
     private TextView mTvTime;
     private TextView mTvWeight;
     private Fragment currentFragment;
+    private Button mBtnSubmit;
     private OnFragmentInteractionListener mListener;
 
     public AppointmentFragment() {
@@ -104,7 +107,7 @@ public class AppointmentFragment extends Fragment implements View.OnClickListene
         mTvType = view.findViewById(R.id.tv_type);
         mTvTime = view.findViewById(R.id.tv_time);
         mTvWeight = view.findViewById(R.id.tv_weight);
-        Button mBtnSubmit = view.findViewById(R.id.btn_submit);
+        mBtnSubmit = view.findViewById(R.id.btn_submit);
         mBtnSubmit.setOnClickListener(this);
         Button mBtnClear = view.findViewById(R.id.btn_clear);
         mBtnClear.setOnClickListener(this);
@@ -152,33 +155,39 @@ public class AppointmentFragment extends Fragment implements View.OnClickListene
                 showPickerView(mTvWeight, weightList, "重量选择");
                 break;
             case R.id.btn_submit:
-                String type = mTvType.getText().toString();
-                String weight = mTvWeight.getText().toString();
-                String time = mTvTime.getText().toString();
-                if (type.equals("")){
-                    showTip("请选择垃圾类型");
-                }else if (weight.equals("")){
-                    showTip("请选择垃圾重量");
-                }else if (time.equals("")){
-                    showTip("请选择预约时间");
-                }else {
-                    showTip("请求提交中...");
-                    ApptBean apptBean = new ApptBean();
-                    apptBean.setType(type);
-                    apptBean.setWeight(weight);
-                    apptBean.setTime(time);
-                    if (apptBean.save()){
-                        showTip("提交成功,请保留下方二维码，稍后会有工作人员联系您");
-                        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-                        fragmentTransaction.addToBackStack(null);
-                        currentFragment = new QRCode();
-                        fragmentTransaction.replace(R.id.frame_qrcode, currentFragment).commitAllowingStateLoss();
-                    }else {
-                        showTip("提交失败，请重试");
-                    }
+                final String type = mTvType.getText().toString();
+                final String weight = mTvWeight.getText().toString();
+                final String time = mTvTime.getText().toString();
+                if (validate()){
+                    mBtnSubmit.setEnabled(false);
+                    final ProgressDialog progressDialog = new ProgressDialog(view.getContext(),
+                            R.style.AppTheme_Dark_Dialog);
+                    progressDialog.setIndeterminate(true);
+                    progressDialog.setMessage("预约中...");
+                    progressDialog.show();
+
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+                                    ApptBean apptBean = new ApptBean();
+                                    apptBean.setType(type);
+                                    apptBean.setWeight(weight);
+                                    apptBean.setTime(time);
+                                    if (apptBean.save()){
+                                        showTip("提交成功,请保留下方二维码，稍后会有工作人员联系您");
+                                        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+                                        fragmentTransaction.addToBackStack(null);
+                                        currentFragment = new QRCode();
+                                        fragmentTransaction.replace(R.id.frame_qrcode, currentFragment).commitAllowingStateLoss();
+                                    }else {
+                                        showTip("提交失败，请重试");
+                                    }
+                                    mBtnSubmit.setEnabled(true);
+                                    progressDialog.dismiss();
+                                }
+                            }, CommonValues.DELAYMILLIS);
 
                 }
-
                 break;
             case R.id.btn_clear:
                 mTvType.setText("");
@@ -192,6 +201,25 @@ public class AppointmentFragment extends Fragment implements View.OnClickListene
                 }
                 break;
         }
+    }
+    public boolean validate() {
+        boolean valid = true;
+
+        String type = mTvType.getText().toString();
+        String weight = mTvWeight.getText().toString();
+        String time = mTvTime.getText().toString();
+
+        if (type.equals("")){
+            showTip("请选择垃圾类型");
+            valid = false;
+        }else if (weight.equals("")){
+            showTip("请选择垃圾重量");
+            valid = false;
+        }else if (time.equals("")){
+            showTip("请选择预约时间");
+            valid = false;
+        }
+        return valid;
     }
 
 

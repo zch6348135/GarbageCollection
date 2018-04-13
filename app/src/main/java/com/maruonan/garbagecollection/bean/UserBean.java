@@ -15,6 +15,16 @@ public class UserBean extends DataSupport {
 
     private String password;
 
+    private String cardNumber;
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
     public String getPassword() {
         return password;
     }

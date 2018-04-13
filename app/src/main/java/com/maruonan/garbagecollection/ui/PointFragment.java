@@ -11,10 +11,16 @@ import android.widget.TextView;
 
 import com.maruonan.garbagecollection.R;
 import com.maruonan.garbagecollection.bean.ApptBean;
+import com.maruonan.garbagecollection.bean.UserBean;
 
 import org.litepal.crud.DataSupport;
 
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,6 +39,13 @@ public class PointFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private int mTimes;
+    private Unbinder unbinder;
+
+    @BindView(R.id.tv_times) TextView _timesText;
+    @BindView(R.id.tv_point) TextView _pointText;
+    @BindView(R.id.tv_amount) TextView _amountText;
+    @BindView(R.id.tv_card) TextView _cardText;
 
     private OnFragmentInteractionListener mListener;
 
@@ -72,12 +85,14 @@ public class PointFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_point, container, false);
-        TextView tvPoint = view.findViewById(R.id.tv_point);
-        TextView tvTimes = view.findViewById(R.id.tv_times);
+        unbinder = ButterKnife.bind(this, view);
         List<ApptBean> apptList =  DataSupport.findAll(ApptBean.class);
-        int times = apptList.size();
-        tvPoint.setText(String.valueOf(times * 10));
-        tvTimes.setText(String.valueOf(times));
+        mTimes = apptList.size();
+        _pointText.setText(String.valueOf(mTimes * 10));
+        _timesText.setText(String.valueOf(mTimes));
+        _amountText.setText(String.valueOf(mTimes * 10));
+        UserBean userBean = DataSupport.find(UserBean.class, 1);
+        _cardText.setText(userBean.getCardNumber());
         return view;
     }
 
@@ -104,7 +119,12 @@ public class PointFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
+    @OnClick(R.id.btn_change)
+    public void change() {
+        _pointText.setText(String.valueOf(0));
+        _timesText.setText(String.valueOf(mTimes));
+        _amountText.setText(String.valueOf(0));
+    }
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -118,5 +138,10 @@ public class PointFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

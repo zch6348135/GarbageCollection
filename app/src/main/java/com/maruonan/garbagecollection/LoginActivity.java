@@ -110,7 +110,7 @@ public class LoginActivity extends AppCompatActivity{
                         }
                         progressDialog.dismiss();
                     }
-                }, 2000);
+                }, CommonValues.DELAYMILLIS);
     }
 
     @OnClick(R.id.link_signup)
